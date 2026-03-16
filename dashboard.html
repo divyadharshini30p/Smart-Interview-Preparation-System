@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --navy: #0a1929;
+            --navy-light: #1e3a6f;
+            --white: #ffffff;
+            --off-white: #f8fafc;
+            --gray: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background: var(--off-white);
+            color: var(--navy);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 { text-align: center; margin-bottom: 2rem; color: var(--navy); }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .stat-card {
+            background: var(--white);
+            border: 1px solid var(--gray);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .stat-card h3 { color: var(--navy-light); margin-bottom: 0.5rem; font-size: 1rem; }
+        .stat-card p { font-size: 2.5rem; font-weight: 700; color: var(--navy); }
+        .charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .chart-container {
+            background: var(--white);
+            border: 1px solid var(--gray);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .chart-container h2 { margin-bottom: 1rem; font-size: 1.2rem; color: var(--navy); text-align: center; }
+        canvas { max-height: 250px; width: 100% !important; }
+        .topics-section {
+            background: white;
+            border: 1px solid var(--gray);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .topics-section h2 { margin-bottom: 1rem; color: var(--navy); }
+        .topic-list { display: flex; flex-direction: column; gap: 0.75rem; }
+        .topic-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .topic-item.weak { background: #fee2e2; color: #991b1b; }
+        .topic-item.strong { background: #d1fae5; color: #065f46; }
+        .back-btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            background: var(--navy);
+            color: white;
+            text-decoration: none;
+            border-radius: 40px;
+            font-weight: 600;
+        }
+        .back-btn:hover { background: var(--navy-light); }
+        .center { text-align: center; margin-top: 1rem; }
+        .empty-state { text-align: center; padding: 3rem; color: var(--gray); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Performance Dashboard</h1>
+        {% if scores and scores|length > 0 %}
+            <div class="stats">
+                <div class="stat-card"><h3>Total Quizzes</h3><p>{{ scores|length }}</p></div>
+                <div class="stat-card"><h3>Average Score</h3><p>{{ "%.1f"|format(scores|map(attribute='percentage')|sum / scores|length) }}%</p></div>
+                <div class="stat-card"><h3>Highest Score</h3><p>{{ "%.1f"|format(scores|map(attribute='percentage')|max) }}%</p></div>
+            </div>
+            <div class="charts">
+                <div class="chart-container"><h2>Score Trend</h2><canvas id="lineChart"></canvas></div>
+                <div class="chart-container"><h2>Score per Attempt</h2><canvas id="barChart"></canvas></div>
+                <div class="chart-container"><h2>Pass vs Fail</h2><canvas id="pieChart"></canvas></div>
+            </div>
+            <div class="topics-section">
+                <h2>⚠️ Topics to Practice More</h2>
+                <div class="topic-list">
+                    {% for t in weak_topics %}
+                    <div class="topic-item weak"><span>{{ t.name }}</span><span>{{ t.avg }}%</span></div>
+                    {% else %}<p>Great job! No weak topics.</p>{% endfor %}
+                </div>
+            </div>
+            <div class="topics-section">
+                <h2>✅ Your Strong Topics</h2>
+                <div class="topic-list">
+                    {% for t in strong_topics %}
+                    <div class="topic-item strong"><span>{{ t.name }}</span><span>{{ t.avg }}%</span></div>
+                    {% else %}<p>Keep practicing to build strong topics.</p>{% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-state"><p>No quiz attempts yet.</p><p><a href="{{ url_for('practice') }}">Start practicing</a> to see your performance.</p></div>
+        {% endif %}
+        <div class="center"><a href="{{ url_for('practice') }}" class="back-btn">← Back to Practice</a></div>
+    </div>
+    {% if scores and scores|length > 0 %}
+    <script>
+        // Use chart_data which is JSON serializable
+        const chartData = {{ chart_data|tojson }};
+        const percentages = chartData.map(item => item.percentage);
+        const dates = chartData.map(item => item.date);
+
+        new Chart(document.getElementById('lineChart'), {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Score %',
+                    data: percentages,
+                    borderColor: '#0a1929',
+                    backgroundColor: 'rgba(10,25,41,0.05)',
+                    tension: 0.2
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Score %',
+                    data: percentages,
+                    backgroundColor: '#0a1929'
+                }]
+            }
+        });
+
+        const passed = percentages.filter(p => p >= 60).length;
+        const failed = percentages.length - passed;
+        new Chart(document.getElementById('pieChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Passed (≥60%)', 'Failed (<60%)'],
+                datasets: [{
+                    data: [passed, failed],
+                    backgroundColor: ['#10b981', '#ef4444']
+                }]
+            }
+        });
+    </script>
+    {% endif %}
+</body>
+</html>

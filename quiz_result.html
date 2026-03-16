@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --navy: #0a1929;
+            --navy-light: #1e3a6f;
+            --white: #ffffff;
+            --off-white: #f8fafc;
+            --gray: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background: var(--off-white);
+            color: var(--navy);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+        h1 { text-align: center; margin-bottom: 1.5rem; }
+        .score-card {
+            background: white;
+            border: 1px solid var(--gray);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .score { font-size: 3rem; font-weight: 700; color: var(--navy); }
+        .percentage { font-size: 2rem; color: var(--navy-light); margin-bottom: 1rem; }
+        .chart-container { width: 200px; height: 200px; margin: 1rem auto; }
+        .question-review {
+            background: white;
+            border: 1px solid var(--gray);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 5px solid transparent;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .correct { border-left-color: var(--success); }
+        .incorrect { border-left-color: var(--danger); }
+        .question-text { font-weight: 600; margin-bottom: 0.75rem; }
+        .answer-row { display: flex; gap: 1.5rem; margin-top: 0.5rem; font-size: 0.95rem; }
+        .user-answer { color: var(--danger); }
+        .correct-answer { color: var(--success); }
+        .explanation {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: var(--off-white);
+            border-radius: 8px;
+            border-left: 3px solid var(--navy-light);
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: var(--navy);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 0.5rem;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: var(--navy-light); }
+        .center { text-align: center; margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz Results</h1>
+        <div class="score-card">
+            <p class="score">{{ score }} / {{ total }}</p>
+            <p class="percentage">{{ "%.1f"|format(percentage) }}%</p>
+            <div class="chart-container"><canvas id="resultChart"></canvas></div>
+        </div>
+        {% for r in results %}
+        <div class="question-review {% if r.is_correct %}correct{% else %}incorrect{% endif %}">
+            <p class="question-text">{{ loop.index }}. {{ r.question }}</p>
+            <div class="answer-row">
+                <span>Your answer: <strong class="user-answer">{{ r.user_answer }}</strong></span>
+                <span>Correct answer: <strong class="correct-answer">{{ r.correct_answer }}</strong></span>
+            </div>
+            <div class="explanation"><strong>Explanation:</strong> {{ r.explanation }}</div>
+        </div>
+        {% endfor %}
+        <div class="center">
+            <a href="{{ url_for('dashboard') }}" class="btn">View Dashboard</a>
+            <a href="{{ url_for('practice') }}" class="btn">Practice More</a>
+        </div>
+    </div>
+    <script>
+        const percentage = {{ percentage }};
+        new Chart(document.getElementById('resultChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    data: [percentage, 100 - percentage],
+                    backgroundColor: ['#10b981', '#ef4444'],
+                    borderWidth: 0
+                }]
+            },
+            options: { cutout: '70%', responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } } }
+        });
+    </script>
+</body>
+</html>

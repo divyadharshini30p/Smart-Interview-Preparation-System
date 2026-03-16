@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Topics</title>
+    <style>
+        :root {
+            --navy: #0a1929;
+            --navy-light: #1e3a6f;
+            --white: #ffffff;
+            --off-white: #f8fafc;
+            --gray: #e2e8f0;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background: var(--off-white);
+            color: var(--navy);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .sidebar {
+            position: fixed;
+            left: -260px;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--navy);
+            color: white;
+            transition: left 0.3s ease;
+            padding: 2rem 0;
+            z-index: 1000;
+        }
+        .sidebar.open { left: 0; }
+        .sidebar a {
+            display: block;
+            padding: 1rem 2rem;
+            color: white;
+            text-decoration: none;
+        }
+        .sidebar a:hover { background: var(--navy-light); }
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            display: block;
+        }
+        .main {
+            margin-left: 0;
+            padding: 2rem;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .menu-toggle {
+            background: var(--navy);
+            color: white;
+            border: none;
+            font-size: 1.8rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        h1 { font-size: 2rem; color: var(--navy); }
+        .practice-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .practice-card {
+            background: white;
+            border: 1px solid var(--gray);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s;
+        }
+        .practice-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--navy);
+            box-shadow: 0 8px 16px rgba(10,25,41,0.1);
+        }
+        .practice-card h3 { margin-bottom: 0.5rem; color: var(--navy); }
+        .practice-card p { color: #94a3b8; }
+        .final-quiz-card {
+            background: var(--navy);
+            color: white;
+            border: none;
+        }
+        .final-quiz-card h3,
+        .final-quiz-card p { color: white; }
+        .final-quiz-card:hover { background: var(--navy-light); }
+        @media (max-width: 768px) {
+            .practice-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" id="closeSidebar">&times;</button>
+        <a href="{{ url_for('index') }}">🏠 Home</a>
+        <a href="{{ url_for('practice') }}">📚 Practice</a>
+        <a href="{{ url_for('history') }}">📜 History</a>
+        <a href="{{ url_for('dashboard') }}">📊 Dashboard</a>
+        <a href="{{ url_for('quiz_start') }}">📝 Final Quiz</a>
+    </div>
+    <div class="main">
+        <header>
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <h1>Practice Topics</h1>
+        </header>
+        <div class="practice-grid">
+            <a href="https://averages.netlify.app" class="practice-card"><h3>📊 Averages</h3><p>10 questions</p></a>
+            <a href="https://calendaraptitude.netlify.app" class="practice-card"><h3>📅 Calendar</h3><p>10 questions</p></a>
+            <a href="https://bloodrelations.netlify.app" class="practice-card"><h3>👨‍👩‍👧 Blood Relations</h3><p>10 questions</p></a>
+            <a href="https://logicalreasonings.netlify.app" class="practice-card"><h3>🧠 Logical Reasoning</h3><p>10 questions</p></a>
+            <a href="https://numerics.netlify.app" class="practice-card"><h3>🔢 Numbers</h3><p>10 questions</p></a>
+            <a href="https://percentagess.netlify.app" class="practice-card"><h3>📈 Percentages</h3><p>10 questions</p></a>
+            <a href="https://permutationss.netlify.app" class="practice-card"><h3>🔄 Permutations</h3><p>10 questions</p></a>
+            <a href="https://probabilitys.netlify.app" class="practice-card"><h3>🎲 Probability</h3><p>10 questions</p></a>
+            <a href="https://profitandlosses.netlify.app" class="practice-card"><h3>💰 Profit & Loss</h3><p>10 questions</p></a>
+            <a href="https://ratioandproportionss.netlify.app" class="practice-card"><h3>⚖️ Ratio</h3><p>10 questions</p></a>
+            <a href="https://siandci.netlify.app" class="practice-card"><h3>🏦 SI & CI</h3><p>10 questions</p></a>
+            <a href="https://timewd.netlify.app" class="practice-card"><h3>⏱️ Time & Work</h3><p>10 questions</p></a>
+            <a href="{{ url_for('quiz_start') }}" class="practice-card final-quiz-card"><h3>🏆 Final Quiz</h3><p>60 questions • All topics</p></a>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const closeBtn = document.getElementById('closeSidebar');
+            menuToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+            closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
+            document.addEventListener('click', (e) => {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target))
+                    sidebar.classList.remove('open');
+            });
+        });
+    </script>
+</body>
+</html>

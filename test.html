@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Quiz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" id="closeSidebar">&times;</button>
+        <a href="{{ url_for('index') }}">🏠 Home</a>
+        <a href="{{ url_for('practice') }}">📚 Practice</a>
+        <a href="{{ url_for('test') }}">📝 Test</a>
+        <a href="{{ url_for('history') }}">📜 History</a>
+    </div>
+
+    <div class="main">
+        <header>
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <h1>Final Quiz (60 Questions)</h1>
+        </header>
+
+        <form action="{{ url_for('submit_test') }}" method="post" class="quiz-form">
+            {% for q in questions %}
+            <div class="question-card">
+                <p class="question">{{ loop.index }}. {{ q.question }}</p>
+                <div class="options">
+                    {% for opt in q.options %}
+                    <label>
+                        <input type="radio" name="q{{ loop.index0 }}" value="{{ opt }}" required>
+                        {{ opt }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+            <button type="submit" class="submit-btn">Submit Quiz</button>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Preparation System</title>
+    <style>
+        /* Navy & White Theme */
+        :root {
+            --navy: #0a1929;
+            --navy-light: #1e3a6f;
+            --white: #ffffff;
+            --off-white: #f8fafc;
+            --gray: #e2e8f0;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background: var(--off-white);
+            color: var(--navy);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: -260px;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--navy);
+            color: white;
+            transition: left 0.3s ease;
+            padding: 2rem 0;
+            z-index: 1000;
+        }
+        .sidebar.open { left: 0; }
+        .sidebar a {
+            display: block;
+            padding: 1rem 2rem;
+            color: white;
+            text-decoration: none;
+        }
+        .sidebar a:hover { background: var(--navy-light); }
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            display: block;
+        }
+        /* Main Content */
+        .main {
+            margin-left: 0;
+            padding: 2rem;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .menu-toggle {
+            background: var(--navy);
+            color: white;
+            border: none;
+            font-size: 1.8rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        h1 { font-size: 2rem; color: var(--navy); }
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, var(--navy), var(--navy-light));
+            border-radius: 20px;
+            color: white;
+            margin-bottom: 3rem;
+        }
+        .hero h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+        .hero p { font-size: 1.2rem; opacity: 0.9; }
+        /* Cards */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        .card {
+            background: white;
+            border: 1px solid var(--gray);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .hero h2 { font-size: 1.8rem; }
+            .cards { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" id="closeSidebar">&times;</button>
+        <a href="{{ url_for('index') }}">🏠 Home</a>
+        <a href="{{ url_for('practice') }}">📚 Practice</a>
+        <a href="{{ url_for('history') }}">📜 History</a>
+        <a href="{{ url_for('dashboard') }}">📊 Dashboard</a>
+        <a href="{{ url_for('quiz_start') }}">📝 Final Quiz</a>   <!-- Fixed: was 'test' -->
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+        <header>
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <h1>Interview Preparation System</h1>
+        </header>
+
+        <section class="hero">
+            <h2>Welcome to Interview Preparation System</h2>
+            <p>Practice aptitude and improve your interview skills</p>
+        </section>
+
+        <div class="cards">
+            <div class="card">
+                <h3>12+ Topics</h3>
+                <p>Comprehensive coverage of all major aptitude areas.</p>
+            </div>
+            <div class="card">
+                <h3>Detailed Dashboard</h3>
+                <p>Visualize your performance with interactive charts.</p>
+            </div>
+            <div class="card">
+                <h3>60‑Question Quiz</h3>
+                <p>Test your knowledge with a comprehensive final quiz.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const closeBtn = document.getElementById('closeSidebar');
+            menuToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+            closeBtn.addEventListener('click', () => sidebar.classList.remove('open'));
+            document.addEventListener('click', (e) => {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target))
+                    sidebar.classList.remove('open');
+            });
+        });
+    </script>
+</body>
+</html>

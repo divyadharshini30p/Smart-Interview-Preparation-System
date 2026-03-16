@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Quiz</title>
+    <style>
+        :root {
+            --navy: #0a1929;
+            --navy-light: #1e3a6f;
+            --white: #ffffff;
+            --off-white: #f8fafc;
+            --gray: #e2e8f0;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background: var(--off-white);
+            color: var(--navy);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 { font-size: 1.8rem; color: var(--navy); }
+        .progress { font-size: 1.2rem; color: var(--navy-light); }
+        .question-card {
+            background: white;
+            border: 1px solid var(--gray);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            color: var(--navy);
+        }
+        .options { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; }
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 2px solid var(--gray);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option:hover { background: var(--off-white); border-color: var(--navy-light); }
+        .option input[type="radio"] { margin-right: 1rem; width: 1.2rem; height: 1.2rem; }
+        .option.selected { background: var(--navy); color: white; border-color: var(--navy); }
+        .option.selected input { accent-color: white; }
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 2rem; }
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary { background: var(--navy); color: white; }
+        .btn-primary:hover { background: var(--navy-light); transform: translateY(-2px); }
+        .btn-secondary { background: white; color: var(--navy); border: 2px solid var(--navy); }
+        .btn-secondary:hover { background: var(--navy); color: white; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        form { display: inline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Final Quiz ({{ total }} Questions)</h1>
+            <span class="progress">Question {{ q_index + 1 }} of {{ total }}</span>
+        </div>
+        <div class="question-card">
+            <p class="question-text">{{ question.question }}</p>
+            <form method="POST" action="{{ url_for('quiz_answer') }}">
+                <input type="hidden" name="q_index" value="{{ q_index }}">
+                <div class="options">
+                    {% for opt in question.options %}
+                    <label class="option {% if selected == opt %}selected{% endif %}">
+                        <input type="radio" name="answer" value="{{ opt }}" {% if selected == opt %}checked{% endif %} required>
+                        {{ opt }}
+                    </label>
+                    {% endfor %}
+                </div>
+                <div class="nav-buttons">
+                    {% if q_index > 0 %}
+                    <button type="submit" name="prev" class="btn btn-secondary">← Previous</button>
+                    {% else %}
+                    <button type="button" class="btn btn-secondary" disabled>← Previous</button>
+                    {% endif %}
+                    {% if q_index < total - 1 %}
+                    <button type="submit" name="next" class="btn btn-primary">Next →</button>
+                    {% else %}
+                    <button type="submit" name="submit" class="btn btn-primary">Submit Quiz</button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.querySelectorAll('.option input').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+                this.parentElement.classList.add('selected');
+            });
+        });
+    </script>
+</body>
+</html>
